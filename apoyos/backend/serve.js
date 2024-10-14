@@ -190,6 +190,7 @@ app.get('/api/gastos', async (req, res) => {
         await connection.end();
     }
 });
+
 // Ruta para registrar nuevos usuarios
 app.post('/api/registro_usuarios', async (req, res) => {
     const connection = await connectDB();
@@ -229,6 +230,50 @@ app.post('/api/registro_usuarios', async (req, res) => {
         await connection.end();
     }
 });
+
+// Ruta para obtener todos los usuarios registrados
+app.get('/api/registro_usuarios', async (req, res) => {
+    const connection = await connectDB();
+
+    try {
+        // Consulta para obtener todos los usuarios
+        const [rows] = await connection.execute('SELECT * FROM usuarios');
+        console.log('Usuarios obtenidos:', rows); // Verifica qué datos se obtienen
+        res.status(200).json(rows); // Devolver los usuarios en formato JSON
+    } catch (error) {
+        console.error('Error al obtener los usuarios:', error);
+        res.status(500).json({ error: 'Error al obtener los usuarios' });
+    } finally {
+        await connection.end();
+    }
+});
+// Ruta para iniciar sesión
+app.post('/api/login', async (req, res) => {
+    const connection = await connectDB();
+    const { nombre, codigoAcceso } = req.body;
+
+    try {
+        // Consulta para verificar si el usuario existe con el nombre y código de acceso proporcionados
+        const query = 'SELECT * FROM usuarios WHERE nombre = ? AND codigo_acceso = ?';
+        const [rows] = await connection.execute(query, [nombre, codigoAcceso]);
+
+        if (rows.length === 0) {
+            // Si no se encuentra un usuario con esos datos, devuelve un error
+            return res.status(401).json({ success: false, message: 'Nombre o código de acceso inválido' });
+        }
+
+        // Si se encuentra el usuario, devuelve éxito y su información
+        const user = rows[0];
+        res.status(200).json({ success: true, message: 'Sesión iniciada', user });
+    } catch (error) {
+        console.error('Error al iniciar sesión:', error);
+        res.status(500).json({ success: false, message: 'Error al iniciar sesión' });
+    } finally {
+        await connection.end();
+    }
+});
+
+
 
 // Iniciar el servidor
 app.listen(puerto, () => {

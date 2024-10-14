@@ -62,7 +62,7 @@ export default {
     const login = async () => {
     try {
         error.value = ''; // Limpiar errores previos
-        const response = await fetch('/api/login', {
+        const response = await fetch('http://localhost:3030/api/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -71,6 +71,7 @@ export default {
         });
         const data = await response.json();
         if (data.success) {
+            alert('Sesión iniciada'); // Mostrar alerta de sesión iniciada
             // Almacenar información del usuario en el almacenamiento local o en el estado de la aplicación
             localStorage.setItem('user', JSON.stringify(data.user));
             // Redirigir al usuario a su página correspondiente según su rol
@@ -89,6 +90,7 @@ export default {
         error.value = 'Ocurrió un error al intentar iniciar sesión. Por favor, intente de nuevo.';
     }
 }
+
 
     return {
       loginData,

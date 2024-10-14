@@ -5,6 +5,7 @@ import GraficaComponent from './components/GraficaComponent.vue';
 import AdminRegister from './components/AdminRegister.vue';
 import LoginComponent from './components/LoginComponent.vue';
 import Home from './components/Home.vue';
+import TablaUsuarios from './components/TablaUsuarios.vue';
 
 const routes = [
   { 
@@ -36,6 +37,11 @@ const routes = [
     path: '/login', 
     name: 'Login',
     component: LoginComponent 
+  },
+  { 
+    path: '/tablaUs', 
+    name: 'TablaUs',
+    component: TablaUsuarios 
   }
 ];
 

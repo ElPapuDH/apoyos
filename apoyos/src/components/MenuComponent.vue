@@ -19,7 +19,7 @@
       </router-link>
       <router-link to="/visual" class="menu-item">
         <span class="menu-icon">👁️</span>
-        Visual
+        Visual de Registros de apoyos
       </router-link>
       <router-link to="/grafica" class="menu-item">
         <span class="menu-icon">📊</span>
@@ -28,6 +28,10 @@
       <router-link to="/registro" class="menu-item">
         <span class="menu-icon">👤</span>
         Registro de Usuarios
+      </router-link>
+      <router-link to="/tablaUs" class="menu-item">
+        <span class="menu-icon">👁️</span>
+        Visualicacion de los usuarios
       </router-link>
       <router-link to="/login" class="menu-item">
         <span class="menu-icon">🔐</span>
