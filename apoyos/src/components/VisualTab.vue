@@ -52,6 +52,7 @@
               <tr>
                 <th>Registro</th>
                 <th>Fecha</th>
+                <th>ID Usuario</th>
                 <th>Nombre</th>
                 <th>Domicilio</th>
                 <th>Colonia/Comunidad</th>
@@ -74,6 +75,7 @@
               <tr v-for="registro in filteredRegistros" :key="registro.Registro">
                 <td>{{ registro.Registro }}</td>
                 <td>{{ formatDate(registro.Fecha) }}</td>
+                <td>{{ registro.id_usuario }}</td>
                 <td>{{ registro.Nombre }}</td>
                 <td>{{ registro.Domicilio_Calle }}</td>
                 <td>{{ registro.Colonia_Comunidad }}</td>

@@ -14,6 +14,10 @@
           <input type="date" id="fecha" v-model="nuevoRegistro.Fecha" required />
         </div>
         <div>
+        <label for="id_usuario">ID de Usuario:</label>
+        <input type="number" id="id_usuario" v-model="nuevoRegistro.id_usuario" required />
+      </div>
+        <div>
           <label for="nombre">Nombre:</label>
           <input type="text" id="nombre" v-model="nuevoRegistro.Nombre" required />
         </div>
@@ -71,89 +75,95 @@
       </form>
     </div>
   </template>
-  
-  <script setup>
-  import { ref } from 'vue';
-  import axios from 'axios';
-  
-  const nuevoRegistro = ref({
-    Registro: null,
-    Fecha: '',
-    Nombre: '',
-    Domicilio_Calle: '',
-    Colonia_Comunidad: '',
-    Seccion: null,
-    Contacto: '',
-    TipoDeApoyo: '',
-    Descripcion_Apoyo: '',
-    Monto_Autorizado: null,
-    Otro_Tipo_De_Ayuda: '',
-    Turnado_A: '',
-    Historial: '',
-    Nube: '',
-    Observaciones: '', 
-    Status: 'En proceso',
-  });
-  
-  const isSubmitting = ref(false);
-  const errorMessage = ref('');
-  
-  // Función para enviar el formulario con verificación de duplicados optimizada
-  const submitForm = async () => {
-      isSubmitting.value = true;
-      errorMessage.value = '';
-  
-      try {
-          // Verificar duplicados en una sola solicitud
-          const response = await axios.get('http://localhost:3000/api/registros/validate', {
-              params: {
-                  Domicilio_Calle: nuevoRegistro.value.Domicilio_Calle,
-                  Colonia_Comunidad: nuevoRegistro.value.Colonia_Comunidad,
-                  Registro: nuevoRegistro.value.Registro
-              }
-          });
-  
-          if (response.data.exists) {
-              errorMessage.value = 'Ya existe un registro con el mismo domicilio, colonia, o número de registro.';
-              isSubmitting.value = false;
-              return;
-          }
-          
-          // Si no hay duplicados, procede a crear el registro
-          await axios.post('http://localhost:3000/api/registros', nuevoRegistro.value);
-          alert('Registro creado exitosamente');
-          resetForm();
-      } catch (err) {
-          console.error('Error al procesar el registro:', err);
-          errorMessage.value = 'Hubo un error al verificar o guardar el registro. Por favor, intente nuevamente.';
-      } finally {
-          isSubmitting.value = false;
-      }
-  };
-  
-  // Función para reiniciar el formulario
-  const resetForm = () => {
-    nuevoRegistro.value = {
-      Registro: null,
-      Fecha: '',
-      Nombre: '',
-      Domicilio_Calle: '',
-      Colonia_Comunidad: '',
-      Seccion: null,
-      Contacto: '',
-      TipoDeApoyo: '',
-      Descripcion_Apoyo: '',
-      Monto_Autorizado: null,
-      Otro_Tipo_De_Ayuda: '',
-      Turnado_A: '',
-      Historial: '',
-      Nube: '',
-      Observaciones: '', 
-      Status: 'En proceso',
-    };
-    errorMessage.value = '';
-  };
-  </script>
+ <script setup>
+ import { ref } from 'vue';
+ import axios from 'axios';
+ import { normalizeText } from '../utils.js'; // Asegúrate de que esta ruta es correcta
+ 
+ const nuevoRegistro = ref({
+   Registro: null,
+   Fecha: '',
+   id_usuario: null,
+   Nombre: '',
+   Domicilio_Calle: '',
+   Colonia_Comunidad: '',
+   Seccion: null,
+   Contacto: '',
+   TipoDeApoyo: '',
+   Descripcion_Apoyo: '',
+   Monto_Autorizado: null,
+   Otro_Tipo_De_Ayuda: '',
+   Turnado_A: '',
+   Historial: '',
+   Nube: '',
+   Observaciones: '', 
+   Status: 'En proceso',
+ });
+ 
+ const isSubmitting = ref(false);
+ const errorMessage = ref('');
+ 
+ const submitForm = async () => {
+   isSubmitting.value = true;
+   errorMessage.value = '';
+ 
+   try {
+       // Normaliza los valores de Domicilio_Calle y Colonia_Comunidad
+       nuevoRegistro.value.Domicilio_Calle = normalizeText(nuevoRegistro.value.Domicilio_Calle);
+       nuevoRegistro.value.Colonia_Comunidad = normalizeText(nuevoRegistro.value.Colonia_Comunidad);
+ 
+       // Verificar duplicados en una sola solicitud
+       const response = await axios.get('http://localhost:3000/api/registros/validate', {
+           params: {
+               Domicilio_Calle: nuevoRegistro.value.Domicilio_Calle,
+               Colonia_Comunidad: nuevoRegistro.value.Colonia_Comunidad,
+               Registro: nuevoRegistro.value.Registro
+           }
+       });
+ 
+       if (response.data.exists) {
+           errorMessage.value = 'Ya existe un registro con el mismo domicilio, colonia, o número de registro.';
+           isSubmitting.value = false;
+           return;
+       }
+       
+       // Si no hay duplicados, procede a crear el registro
+       await axios.post('http://localhost:3000/api/registros', nuevoRegistro.value);
+       alert('Registro creado exitosamente');
+       resetForm();
+   } catch (err) {
+       console.error('Error al procesar el registro:', err);
+       errorMessage.value = 'Hubo un error al verificar o guardar el registro. Por favor, intente nuevamente.';
+   } finally {
+       isSubmitting.value = false;
+   }
+ };
+ 
+ // Función para reiniciar el formulario
+ const resetForm = () => {
+   nuevoRegistro.value = {
+     Registro: null,
+     Fecha: '',
+     id_usuario: null,
+     Nombre: '',
+     Domicilio_Calle: '',
+     Colonia_Comunidad: '',
+     Seccion: null,
+     Contacto: '',
+     TipoDeApoyo: '',
+     Descripcion_Apoyo: '',
+     Monto_Autorizado: null,
+     Otro_Tipo_De_Ayuda: '',
+     Turnado_A: '',
+     Historial: '',
+     Nube: '',
+     Observaciones: '', 
+     Status: 'En proceso',
+   };
+   errorMessage.value = '';
+ };
+ </script>
+ 
   
   <style scoped>
   .registro-form {

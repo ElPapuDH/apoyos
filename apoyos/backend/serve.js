@@ -3,10 +3,17 @@ const mysql = require('mysql2/promise');
 const cors = require('cors');
 
 const app = express();
-const puerto = 3000;
+const puerto = 3030; // Cambiar el puerto a 3030
 
-app.use(cors());
+const corsOptions = {
+    origin: '*', // Permitir cualquier origen
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos permitidos
+    allowedHeaders: ['Content-Type', 'Authorization'], // Encabezados permitidos
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
+
 
 const dbConfig = {
     host: '127.0.0.1',
@@ -31,22 +38,23 @@ app.get('/', (req, res) => {
     res.send('Servidor funcionando correctamente. Usa /api/registros para las solicitudes POST y GET.');
 });
 
-// Ruta para insertar datos en la tabla "apoyos"
+// Modificar la ruta para insertar datos en la tabla "apoyos"
 app.post('/api/registros', async (req, res) => {
     const connection = await connectDB();
     const {
-        Registro, Fecha, Nombre, Domicilio_Calle, Colonia_Comunidad,
+        Registro, id_usuario, Fecha, Nombre, Domicilio_Calle, Colonia_Comunidad,
         Seccion, Contacto, TipoDeApoyo, Descripcion_Apoyo, Status,
         Monto_Autorizado, Otro_Tipo_De_Ayuda, Turnado_A, Historial, Nube, Observaciones
     } = req.body;
 
-    const query = `INSERT INTO apoyos (Registro, Fecha, Nombre, Domicilio_Calle,
+    const query = `INSERT INTO apoyos (Registro, id_usuario, Fecha, Nombre, Domicilio_Calle,
                    Colonia_Comunidad, Seccion, Contacto, TipoDeApoyo, Descripcion_Apoyo,
                    Status, Monto_Autorizado, Otro_Tipo_De_Ayuda, Turnado_A, Historial, Nube, Observaciones) 
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
 
     try {
-        const [result] = await connection.execute(query, [Registro, Fecha, Nombre, Domicilio_Calle,
+        const [result] = await connection.execute(query, [Registro, id_usuario, Fecha, Nombre, Domicilio_Calle,
             Colonia_Comunidad, Seccion, Contacto, TipoDeApoyo, Descripcion_Apoyo, Status,
             Monto_Autorizado, Otro_Tipo_De_Ayuda, Turnado_A, Historial, Nube, Observaciones]);
         res.status(201).json({ message: 'Registro guardado exitosamente', id: result.insertId });
@@ -63,12 +71,17 @@ app.get('/api/registros/validate', async (req, res) => {
     const connection = await connectDB();
     const { Domicilio_Calle, Colonia_Comunidad, Registro } = req.query;
 
+    // Normaliza las entradas para la comparación
+    const normalizedCalle = Domicilio_Calle.toLowerCase().trim().replace(/\s+/g, ' ');
+    const normalizedColonia = Colonia_Comunidad.toLowerCase().trim().replace(/\s+/g, ' ');
+
     const query = `SELECT COUNT(*) AS count FROM apoyos 
-                   WHERE (Domicilio_Calle = ? AND Colonia_Comunidad = ?) 
+                   WHERE (LOWER(TRIM(REPLACE(Domicilio_Calle, ' ', ' '))) = ? 
+                   AND LOWER(TRIM(REPLACE(Colonia_Comunidad, ' ', ' '))) = ?) 
                    OR (Registro = ?)`;
 
     try {
-        const [results] = await connection.execute(query, [Domicilio_Calle, Colonia_Comunidad, Registro]);
+        const [results] = await connection.execute(query, [normalizedCalle, normalizedColonia, Registro]);
         const exists = results[0].count > 0;
         res.status(200).json({ exists });
     } catch (err) {
@@ -78,7 +91,6 @@ app.get('/api/registros/validate', async (req, res) => {
         await connection.end();
     }
 });
-
 
 // Nueva ruta GET para obtener todos los registros
 app.get('/api/registros', async (req, res) => {
@@ -122,22 +134,21 @@ app.put('/api/registros/:id', async (req, res) => {
     const connection = await connectDB();
     const registroId = req.params.id;
     const {
-        Fecha, Nombre, Domicilio_Calle, Colonia_Comunidad,
+        id_usuario, Fecha, Nombre, Domicilio_Calle, Colonia_Comunidad,
         Seccion, Contacto, TipoDeApoyo, Descripcion_Apoyo, Status,
         Monto_Autorizado, Turnado_A, Historial, Nube, Observaciones
     } = req.body;
 
-    // Formatear la fecha
-    const fechaFormateada = new Date(Fecha).toISOString().split('T')[0]; // 'YYYY-MM-DD'
+    const fechaFormateada = new Date(Fecha).toISOString().split('T')[0];
 
     const query = `UPDATE apoyos SET 
-                   Fecha = ?, Nombre = ?, Domicilio_Calle = ?, Colonia_Comunidad = ?,
+                   id_usuario = ?, Fecha = ?, Nombre = ?, Domicilio_Calle = ?, Colonia_Comunidad = ?,
                    Seccion = ?, Contacto = ?, TipoDeApoyo = ?, Descripcion_Apoyo = ?, Status = ?,
                    Monto_Autorizado = ?, Turnado_A = ?, Historial = ?, Nube = ?, Observaciones = ?
                    WHERE Registro = ?`;
 
     try {
-        const [result] = await connection.execute(query, [fechaFormateada, Nombre, Domicilio_Calle, Colonia_Comunidad,
+        const [result] = await connection.execute(query, [id_usuario, fechaFormateada, Nombre, Domicilio_Calle, Colonia_Comunidad,
             Seccion, Contacto, TipoDeApoyo, Descripcion_Apoyo, Status,
             Monto_Autorizado, Turnado_A, Historial, Nube, Observaciones, registroId]);
         if (result.affectedRows === 0) {
@@ -179,11 +190,47 @@ app.get('/api/gastos', async (req, res) => {
         await connection.end();
     }
 });
+// Ruta para registrar nuevos usuarios
+app.post('/api/registro_usuarios', async (req, res) => {
+    const connection = await connectDB();
+    const { nombre, correo, rol, codigo_acceso, id_usuario } = req.body;
 
+    // Verificar si el correo ya existe
+    const emailCheckQuery = 'SELECT * FROM usuarios WHERE correo = ?';
+    const [existingUser] = await connection.execute(emailCheckQuery, [correo]);
+    if (existingUser.length > 0) {
+        return res.status(400).json({ error: 'El correo ya está registrado.' });
+    }
 
+    // Asegurarse de que el id_usuario sea nulo para admin o gerente
+    let userId = id_usuario; // Tomar id_usuario del cuerpo de la solicitud
+    if (rol === 'admin' || rol === 'gerente') {
+        userId = null; // No se necesita id_usuario para admin o gerente
+    } else if (!userId) {
+        return res.status(400).json({ error: 'El id_usuario es requerido para usuarios normales.' });
+    }
 
+    // Inserción en la tabla usuarios
+    const insertQuery = `INSERT INTO usuarios (id_usuario, nombre, correo, codigo_acceso, rol) 
+                         VALUES (?, ?, ?, ?, ?)`;
+    try {
+        const [result] = await connection.execute(insertQuery, [
+            userId, // Asegurarse de que sea nulo si no se proporciona para admin o gerente
+            nombre,
+            correo,
+            codigo_acceso,
+            rol,
+        ]);
+        res.status(201).json({ message: 'Usuario registrado exitosamente', codigo_acceso: codigo_acceso });
+    } catch (err) {
+        console.error('Error al registrar usuario:', err);
+        res.status(500).json({ error: 'Error al registrar el usuario' });
+    } finally {
+        await connection.end();
+    }
+});
 
-// Servidor escuchando
+// Iniciar el servidor
 app.listen(puerto, () => {
-    console.log(`Servidor escuchando en http://localhost:${puerto}`);
+    console.log(`Servidor corriendo en http://localhost:${puerto}`);
 });

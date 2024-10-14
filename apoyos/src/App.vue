@@ -1,7 +1,9 @@
 <template>
   <div class="app-container">
     <MenuComponent />
-    <router-view></router-view>
+    <div class="main-content">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
@@ -9,11 +11,16 @@
 import MenuComponent from './components/MenuComponent.vue';
 </script>
 
-<style scoped>
+<style>
 .app-container {
+  display: flex;
   font-family: Arial, sans-serif;
-  max-width: 800px;
-  margin: 0 auto;
+  height: 100vh;
+}
+
+.main-content {
+  flex-grow: 1;
   padding: 20px;
+  overflow-y: auto;
 }
 </style>
