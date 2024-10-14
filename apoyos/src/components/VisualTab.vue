@@ -158,7 +158,7 @@
   // Fetch de registros
   const fetchRegistros = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/registros');
+      const response = await axios.get('http://localhost:3030/api/registros');
       registros.value = response.data;
       loading.value = false;
   
@@ -237,7 +237,7 @@
   // Actualizar el registro en la base de datos
   const actualizarRegistro = async () => {
     try {
-      await axios.put(`http://localhost:3000/api/registros/${editRegistro.value.Registro}`, editRegistro.value);
+      await axios.put(`http://localhost:3030/api/registros/${editRegistro.value.Registro}`, editRegistro.value);
       const index = registros.value.findIndex(registro => registro.Registro === editRegistro.value.Registro);
       registros.value[index] = { ...editRegistro.value }; // Actualizar el registro en la lista
       cancelarEdicion(); // Resetear el formulario
@@ -257,7 +257,7 @@
   // Eliminar registro de la base de datos
   const eliminarRegistro = async (registroId) => {
     try {
-      await axios.delete(`http://localhost:3000/api/registros/${registroId}`);
+      await axios.delete(`http://localhost:3030/api/registros/${registroId}`);
       registros.value = registros.value.filter(registro => registro.Registro !== registroId);
     } catch (err) {
       console.error('Error al eliminar el registro:', err);

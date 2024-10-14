@@ -3,7 +3,7 @@ const mysql = require('mysql2/promise');
 const cors = require('cors');
 
 const app = express();
-const puerto = 3030; // Cambiar el puerto a 3030
+const puerto = 3030; 
 
 const corsOptions = {
     origin: '*', // Permitir cualquier origen

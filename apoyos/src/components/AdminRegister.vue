@@ -388,15 +388,6 @@ export default {
   background-color: #4338ca;
 }
 
-.focus\:ring-2:focus {
-  ring-width: 2px;
-}
-
-.focus\:ring-offset-2:focus {
-  ring-offset-width: 2px;
-  ring-offset-color: #fff;
-}
-
 .mt-4 {
   margin-top: 1rem;
 }

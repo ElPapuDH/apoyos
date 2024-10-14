@@ -113,7 +113,7 @@
        nuevoRegistro.value.Colonia_Comunidad = normalizeText(nuevoRegistro.value.Colonia_Comunidad);
  
        // Verificar duplicados en una sola solicitud
-       const response = await axios.get('http://localhost:3000/api/registros/validate', {
+       const response = await axios.get('http://localhost:3030/api/registros/validate', {
            params: {
                Domicilio_Calle: nuevoRegistro.value.Domicilio_Calle,
                Colonia_Comunidad: nuevoRegistro.value.Colonia_Comunidad,
@@ -128,7 +128,7 @@
        }
        
        // Si no hay duplicados, procede a crear el registro
-       await axios.post('http://localhost:3000/api/registros', nuevoRegistro.value);
+       await axios.post('http://localhost:3030/api/registros', nuevoRegistro.value);
        alert('Registro creado exitosamente');
        resetForm();
    } catch (err) {
