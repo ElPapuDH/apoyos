@@ -46,60 +46,41 @@
   </div>
 </template>
 
-<script>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+<script setup>
+import { ref, defineEmits } from 'vue'
 
-export default {
-  setup() {
-    const loginData = ref({
-      nombre: '',
-      codigoAcceso: ''
+const loginData = ref({
+  nombre: '',
+  codigoAcceso: ''
+})
+const error = ref('')
+
+const emit = defineEmits(['login-success'])
+
+const login = async () => {
+  try {
+    error.value = '' // Limpiar errores previos
+    const response = await fetch('http://localhost:3030/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(loginData.value) // Envia { nombre, codigoAcceso }
     })
-    const error = ref('')
-    const router = useRouter()
-
-    const login = async () => {
-    try {
-        error.value = ''; // Limpiar errores previos
-        const response = await fetch('http://localhost:3030/api/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(loginData.value) // Envia { nombre, codigoAcceso }
-        });
-        const data = await response.json();
-        if (data.success) {
-            alert('Sesión iniciada'); // Mostrar alerta de sesión iniciada
-            // Almacenar información del usuario en el almacenamiento local o en el estado de la aplicación
-            localStorage.setItem('user', JSON.stringify(data.user));
-            // Redirigir al usuario a su página correspondiente según su rol
-            if (data.user.rol === 'admin') {
-                router.push('/admin-dashboard');
-            } else if (data.user.rol === 'gerente') {
-                router.push('/gerente-dashboard');
-            } else {
-                router.push('/user-dashboard');
-            }
-        } else {
-            error.value = 'Nombre o código de acceso inválido';
-        }
-    } catch (err) {
-        console.error('Error al iniciar sesión:', err);
-        error.value = 'Ocurrió un error al intentar iniciar sesión. Por favor, intente de nuevo.';
+    const data = await response.json()
+    if (data.success) {
+      localStorage.setItem('user', JSON.stringify(data.user))
+      emit('login-success') // Emitir evento de inicio de sesión exitoso
+    } else {
+      error.value = 'Nombre o código de acceso inválido'
     }
-}
-
-
-    return {
-      loginData,
-      login,
-      error
-    }
+  } catch (err) {
+    console.error('Error al iniciar sesión:', err)
+    error.value = 'Ocurrió un error al intentar iniciar sesión. Por favor, intente de nuevo.'
   }
 }
 </script>
+
 <style scoped>
 /* Estilo del contenedor principal */
 .min-h-screen {

@@ -1,7 +1,7 @@
 import { createApp } from 'vue';
-import App from './App.vue'; // Asegúrate de que este archivo existe
-import router from './router'; // Asegúrate de que el path es correcto
+import App from './App.vue';
+import router from './router'; 
 
 const app = createApp(App);
-app.use(router); // Aquí estás utilizando el router
+app.use(router); 
 app.mount('#app');

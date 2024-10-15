@@ -9,7 +9,12 @@ import TablaUsuarios from './components/TablaUsuarios.vue';
 
 const routes = [
   { 
-    path: '/', 
+    path: '/login', 
+    name: 'Login',
+    component: LoginComponent 
+  },
+  { 
+    path: '/home', 
     name: 'Home',
     component: Home 
   },
@@ -34,16 +39,12 @@ const routes = [
     component: AdminRegister 
   },
   { 
-    path: '/login', 
-    name: 'Login',
-    component: LoginComponent 
-  },
-  { 
     path: '/tablaUs', 
     name: 'TablaUs',
     component: TablaUsuarios 
   }
 ];
+
 
 const router = createRouter({
   history: createWebHistory(),

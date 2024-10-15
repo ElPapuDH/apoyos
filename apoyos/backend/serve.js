@@ -247,6 +247,49 @@ app.get('/api/registro_usuarios', async (req, res) => {
         await connection.end();
     }
 });
+// Ruta para eliminar un usuario por ID
+app.delete('/api/registro_usuarios/:id', async (req, res) => {
+    const connection = await connectDB();
+    const { id } = req.params;
+
+    try {
+        const [result] = await connection.execute('DELETE FROM usuarios WHERE id = ?', [id]);
+        if (result.affectedRows > 0) {
+            res.status(200).json({ message: 'Usuario eliminado correctamente' });
+        } else {
+            res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+    } catch (error) {
+        console.error('Error al eliminar el usuario:', error);
+        res.status(500).json({ error: 'Error al eliminar el usuario' });
+    } finally {
+        await connection.end();
+    }
+});
+
+// Ruta para editar un usuario por ID
+app.put('/api/registro_usuarios/:id', async (req, res) => {
+    const connection = await connectDB();
+    const { id } = req.params;
+    const { nombre, correo, rol, codigo_acceso } = req.body;
+
+    try {
+        const [result] = await connection.execute(
+            'UPDATE usuarios SET nombre = ?, correo = ?, rol = ?, codigo_acceso = ? WHERE id = ?',
+            [nombre, correo, rol, codigo_acceso, id]
+        );
+        if (result.affectedRows > 0) {
+            res.status(200).json({ message: 'Usuario actualizado correctamente' });
+        } else {
+            res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+    } catch (error) {
+        console.error('Error al actualizar el usuario:', error);
+        res.status(500).json({ error: 'Error al actualizar el usuario' });
+    } finally {
+        await connection.end();
+    }
+});
 // Ruta para iniciar sesión
 app.post('/api/login', async (req, res) => {
     const connection = await connectDB();

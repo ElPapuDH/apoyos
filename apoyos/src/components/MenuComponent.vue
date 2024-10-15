@@ -1,15 +1,12 @@
 <template>
   <div :class="['menu-container', { 'menu-open': isMenuOpen }]">
-    <button @click="toggleMenu" class="menu-toggle-btn">
-      <span v-if="!isMenuOpen">☰</span>
-      <span v-else>&times;</span>
+    <button v-if="!isMenuOpen" @click="toggleMenu" class="menu-toggle-btn">
+      <span>☰</span>
     </button>
     <nav class="menu" v-show="isMenuOpen">
       <div class="menu-header">
-        <!-- <img src="/path-to-your-logo.png" alt="Logo" class="menu-logo"> -->
-        <input type="text" placeholder="Buscar en el menú..." class="menu-search">
       </div>
-      <router-link to="/" class="menu-item">
+      <router-link to="/home" class="menu-item">
         <span class="menu-icon">🏠</span>
         Inicio
       </router-link>
@@ -48,7 +45,7 @@
 <script setup>
 import { ref } from 'vue';
 
-const isMenuOpen = ref(false); // Cambiado a false para que el menú esté cerrado por defecto
+const isMenuOpen = ref(false); 
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
@@ -62,11 +59,11 @@ const toggleMenu = () => {
   background-color: #f8f9fa;
   transition: width 0.3s ease;
   overflow-y: auto;
-  position: relative; /* Añadido para el botón */
+  position: relative;
 }
 
 .menu-container:not(.menu-open) {
-  width: 60px; /* Tamaño del contenedor cuando está cerrado */
+  width: 60px;
 }
 
 .menu {
@@ -117,14 +114,15 @@ const toggleMenu = () => {
 }
 
 .menu-toggle-btn {
-  position: absolute;
+  position: fixed;
   top: 10px;
-  right: 10px;
+  left: 10px;
   background: none;
   border: none;
   font-size: 1.5em;
   cursor: pointer;
   color: #495057;
+  z-index: 1000;
 }
 
 .hide-menu-btn {
